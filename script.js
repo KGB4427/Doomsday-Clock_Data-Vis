@@ -54,7 +54,7 @@ function setup() {
 function draw() {
 
     //Clear the background
-    background(80); //0 - 100
+    background(0); //0 - 100
 
     //circle(mouseX, mouseY, globeScale*0.1);
 
