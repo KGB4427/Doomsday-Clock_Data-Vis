@@ -5,12 +5,42 @@ let HourH;
 let ratio = 1.7778; //16:9
 let globeScale;
 let clockW, clockH, clockX, clockY;
-let r = 0; //clock rotation angle
+let currentR = 0; //clock rotation angle
+let targetR = 0;
+let imageArray = [];
 
 function preload() {
     table = loadTable('Doomsday_Clock.csv', 'csv', 'header');
     clockFace = loadImage('./Doomsday_Clock_Photos/DD-clock.png');
     HourH = loadImage('./Doomsday_Clock_Photos/HH.png');
+
+    imageArray[0] = loadImage('./Doomsday_Clock_Photos/History/1947.jpg');
+    imageArray[1] = loadImage('./Doomsday_Clock_Photos/History/1949.jpg');
+    imageArray[2] = loadImage('./Doomsday_Clock_Photos/History/1953.jpg');
+    imageArray[3] = loadImage('./Doomsday_Clock_Photos/History/1960.jpg');
+    imageArray[4] = loadImage('./Doomsday_Clock_Photos/History/1963.jpg');
+    imageArray[5] = loadImage('./Doomsday_Clock_Photos/History/1968.jpg');
+    imageArray[6] = loadImage('./Doomsday_Clock_Photos/History/1969.jpg');
+    imageArray[7] = loadImage('./Doomsday_Clock_Photos/History/1972.jpg');
+    imageArray[8] = loadImage('./Doomsday_Clock_Photos/History/1974.jpg');
+    imageArray[9] = loadImage('./Doomsday_Clock_Photos/History/1980.jpg');
+    imageArray[10] = loadImage('./Doomsday_Clock_Photos/History/1981.jpg');
+    imageArray[11] = loadImage('./Doomsday_Clock_Photos/History/1984.jpg');
+    imageArray[12] = loadImage('./Doomsday_Clock_Photos/History/1988.jpg');
+    imageArray[13] = loadImage('./Doomsday_Clock_Photos/History/1990.jpg');
+    imageArray[14] = loadImage('./Doomsday_Clock_Photos/History/1991.jpg');
+    imageArray[15] = loadImage('./Doomsday_Clock_Photos/History/1995.jpg');
+    imageArray[16] = loadImage('./Doomsday_Clock_Photos/History/1998.jpg');
+    imageArray[17] = loadImage('./Doomsday_Clock_Photos/History/2002.jpg');
+    imageArray[18] = loadImage('./Doomsday_Clock_Photos/History/2007.jpg');
+    imageArray[19] = loadImage('./Doomsday_Clock_Photos/History/2010.jpg');
+    imageArray[20] = loadImage('./Doomsday_Clock_Photos/History/2012.jpg');
+    imageArray[21] = loadImage('./Doomsday_Clock_Photos/History/2015.jpg');
+    imageArray[22] = loadImage('./Doomsday_Clock_Photos/History/2017.jpg');
+    imageArray[23] = loadImage('./Doomsday_Clock_Photos/History/2018.jpg');
+    imageArray[24] = loadImage('./Doomsday_Clock_Photos/History/2020.jpg');
+    imageArray[25] = loadImage('./Doomsday_Clock_Photos/History/2023.jpg');
+
 }
 
 function setup() {
@@ -35,7 +65,7 @@ function setup() {
     //console.log(columnArray);
 
     let infoArray = table.getColumn('reason');
-    console.log(infoArray);
+    //console.log(infoArray);
   
     //Create a slider : Parameters - (min value, max value, starting value, step value)
     sliderYear = createSlider(table.getColumn('year')[0], table.getColumn('year')[table.getRowCount() - 1], table.getColumn('year')[0], 1);
@@ -53,6 +83,14 @@ function setup() {
 
 function draw() {
 
+    // Define tan and red colors
+    let tan = color(255, 253, 208);
+    let red = color(255, 20, 35);
+    
+    let amt = map(currentR, -70, 0, 0, 1);
+    
+    let gradientCol = lerpColor(tan, red, amt);
+
     //Clear the background
     background(0); //0 - 100
 
@@ -61,9 +99,27 @@ function draw() {
     //Importing the clock
     //change 10 to width*0.01
     imageMode(CENTER);
+        // if(r > -54){
+
+    // } else {
+    // }
+
+    // if(r < -54){
+    //     tint(255, 253, 208);  //tan
+    // } else if(r < -30){
+    //     tint(255, 100, 100);  //red tan
+    // } else if( r < -15){
+    //     tint(255, 50, 50);  //red
+    // } else {
+    //     tint(255, 0, 0); 
+    // }
+    tint(gradientCol);
+
     image(clockFace, clockX, clockY, clockW, clockH);
     image(HourH, clockX, clockY / 1.2, globeScale * .1, globeScale *.25);
   
+    noTint(); 
+
     // Display the slider value
     let val = sliderYear.value();
 
@@ -85,6 +141,7 @@ function draw() {
         textWrap(WORD);
         textAlign(LEFT);
         doomsdayInfo();
+        
     }
 
     circle(clockX, clockY / 2.01, iconS); //icon
@@ -95,14 +152,13 @@ function draw() {
 
 }
 
-
 function showText() {
 
     //csv text info
     fill(255);
     textSize(globeScale*0.05);
     text("This is the test data", width*0.8, height*0.7);
-
+    
 }
 
 function exClockHand() {
@@ -114,7 +170,7 @@ function exClockHand() {
 
     push();
     translate(rectX, rectY);
-    rotate(radians(r));
+    rotate(radians(currentR));
 
     rect(0, 0, rectW, rectH);
     pop(); 
@@ -130,24 +186,30 @@ function exClockHand() {
 
     for (let i = 0; i < table.getRowCount(); i++) {
 
-            if (sliderYear.value() == table.getColumn('year')[i]) {
-                
-                r = -table.getColumn('sec_to_midnight')[i] / 10;
+        if (sliderYear.value() == table.getColumn('year')[i]) {
+            
+            targetR = -table.getColumn('sec_to_midnight')[i] / 10;
 
-                if (table.getColumn('sec_to_midnight')[i] <= 120) {
-                    text(addLetterSpacing(table.getColumn('sec_to_midnight')[i] + " Seconds \ntill Midnight", 2), clockX, clockY - clockH/1.45);
-                }
-                else {
-                    text(addLetterSpacing(table.getColumn('sec_to_midnight')[i] / 60.0 + " Minutes \ntill Midnight", 2), clockX, clockY - clockH/1.45);
-                }        
-        }
+            if (table.getColumn('sec_to_midnight')[i] <= 120) {
+                text(addLetterSpacing(table.getColumn('sec_to_midnight')[i] + " Seconds \ntill Midnight", 2), clockX, clockY - clockH/1.45);
+            }
+            else {
+                text(addLetterSpacing(table.getColumn('sec_to_midnight')[i] / 60.0 + " Minutes \ntill Midnight", 2), clockX, clockY - clockH/1.45);
+            }        
     }
+    
+}
+
+
+// Smoothly transition currentR towards r
+currentR = lerp(currentR, targetR, 0.05); //0 - 1
 }
 
 function doomsdayInfo() {
     for (let i = 0; i < table.getRowCount(); i++) {
 
         if (sliderYear.value() == table.getColumn('year')[i]) {
+            imageShow(i);
             textSize(globeScale*0.02);
             text(addLetterSpacing(table.getColumn('reason')[i], 2), width*0.45, clockY, globeScale*0.9);
 
@@ -155,8 +217,13 @@ function doomsdayInfo() {
 }
 }
 
-function imageShow() {
+function imageShow(i) {
+    let imgX = width * 0.615;
+    let imgY = height * 0.3;
+    let imgSize = globeScale * 0.3;
     
+
+    image(imageArray[i], imgX, imgY, imgSize * 2, imgSize);
 }
 
 /*
